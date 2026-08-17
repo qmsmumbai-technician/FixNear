@@ -70,7 +70,7 @@ class MainActivity : Activity() {
             gravity = Gravity.CENTER_VERTICAL
         }
 
-        val menu = text("☰", 30, dark)
+        val menu = text("☰", 30f, dark)
         header.addView(
             menu,
             LinearLayout.LayoutParams(dp(55), dp(55))
