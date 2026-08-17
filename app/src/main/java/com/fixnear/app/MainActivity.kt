@@ -1,196 +1,732 @@
 package com.fixnear.app
 
 import android.app.Activity
+import android.os.Bundle
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
-import android.os.Bundle
 import android.view.Gravity
+import android.view.View
 import android.widget.*
 
 class MainActivity : Activity() {
 
-    private val services = arrayOf(
-        "🔧  Plumber",
-        "⚡  Electrician",
-        "🪚  Carpenter",
-        "❄️  AC / Refrigerator",
-        "🧹  Cleaning Service",
-        "🎨  Painter",
-        "🔑  Locksmith"
-    )
+    private val blue = Color.rgb(20, 79, 180)
+    private val dark = Color.rgb(25, 32, 45)
+    private val orange = Color.rgb(255, 75, 35)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         showHome()
     }
 
+    private fun dp(value: Int): Int =
+        (value * resources.displayMetrics.density).toInt()
+
+    private fun roundedBackground(
+        color: Int,
+        radius: Int = 18,
+        strokeColor: Int? = null
+    ): GradientDrawable {
+        return GradientDrawable().apply {
+            setColor(color)
+            cornerRadius = dp(radius).toFloat()
+            strokeColor?.let { setStroke(dp(1), it) }
+        }
+    }
+
+    private fun text(
+        value: String,
+        size: Float,
+        color: Int = dark,
+        bold: Boolean = false
+    ): TextView {
+        return TextView(this).apply {
+            text = value
+            textSize = size
+            setTextColor(color)
+            gravity = Gravity.CENTER_VERTICAL
+            if (bold) typeface = Typeface.DEFAULT_BOLD
+        }
+    }
+
     private fun showHome() {
+
+        val scroll = ScrollView(this).apply {
+            setBackgroundColor(Color.rgb(250, 251, 253))
+        }
+
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(24, 28, 24, 20)
-            setBackgroundColor(Color.rgb(247, 249, 252))
+            setPadding(dp(18), dp(12), dp(18), dp(18))
         }
 
-        val scroll = ScrollView(this)
-        val content = LinearLayout(this).apply {
+        scroll.addView(root)
+
+        // ---------------- HEADER ----------------
+
+        val header = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+
+        val menu = text("☰", 30, dark)
+        header.addView(
+            menu,
+            LinearLayout.LayoutParams(dp(55), dp(55))
+        )
+
+        val logoBox = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+        }
+
+        val logo = TextView(this).apply {
+            text = "FixNear"
+            textSize = 34f
+            gravity = Gravity.CENTER
+            typeface = Typeface.DEFAULT_BOLD
+        }
+
+        val logoText = android.text.SpannableString("FixNear")
+        logoText.setSpan(
+            android.text.style.ForegroundColorSpan(blue),
+            0, 3,
+            android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        logoText.setSpan(
+            android.text.style.ForegroundColorSpan(orange),
+            3, 7,
+            android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        logo.text = logoText
+
+        logoBox.addView(logo)
+
+        val subtitle = text(
+            "A technician is just a tap away.",
+            13f,
+            Color.GRAY
+        )
+        subtitle.gravity = Gravity.CENTER
+        logoBox.addView(subtitle)
+
+        header.addView(
+            logoBox,
+            LinearLayout.LayoutParams(0, dp(65), 1f)
+        )
+
+        val notification = TextView(this).apply {
+            text = "🔔"
+            textSize = 27f
+            gravity = Gravity.CENTER
+        }
+
+        header.addView(
+            notification,
+            LinearLayout.LayoutParams(dp(55), dp(55))
+        )
+
+        root.addView(header)
+
+        // ---------------- LOCATION ----------------
+
+        val location = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(14), dp(8), dp(14), dp(8))
+            background = roundedBackground(Color.WHITE, 20)
+            elevation = dp(3).toFloat()
+        }
+
+        val pin = text("📍", 27f)
+        location.addView(
+            pin,
+            LinearLayout.LayoutParams(dp(45), dp(60))
+        )
+
+        val locationText = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
         }
 
-        content.addView(TextView(this).apply {
-            text = "FixNear"
-            textSize = 32f
-            setTextColor(Color.rgb(20, 70, 140))
-            gravity = Gravity.CENTER
-            setTypeface(null, Typeface.BOLD)
-        })
+        locationText.addView(
+            text("Your Location", 12f, Color.GRAY, false)
+        )
 
-        content.addView(TextView(this).apply {
-            text = "Find a trusted technician near you"
-            textSize = 17f
-            setTextColor(Color.DKGRAY)
-            gravity = Gravity.CENTER
-            setPadding(0, 8, 0, 24)
-        })
+        locationText.addView(
+            text(
+                "Andheri West, Mumbai, Maharashtra",
+                16f,
+                dark,
+                true
+            )
+        )
 
-        content.addView(TextView(this).apply {
-            text = "📍  Your location\nTap a service to find technicians nearby"
-            textSize = 16f
-            setTextColor(Color.rgb(35, 55, 75))
-            setPadding(20, 18, 20, 18)
-            background = roundedBackground(Color.WHITE, 18)
-            elevation = 5f
-        }, marginParams(0, 0, 0, 20))
+        location.addView(
+            locationText,
+            LinearLayout.LayoutParams(0, dp(60), 1f)
+        )
 
-        content.addView(TextView(this).apply {
-            text = "Choose a service"
-            textSize = 21f
-            setTextColor(Color.rgb(30, 30, 30))
-            setTypeface(null, Typeface.BOLD)
-            setPadding(4, 0, 0, 12)
-        })
+        val arrow = text("⌄", 27f)
+        location.addView(
+            arrow,
+            LinearLayout.LayoutParams(dp(35), dp(60))
+        )
 
-        val grid = GridLayout(this).apply { columnCount = 2 }
-
-        services.forEach { service ->
-            val card = TextView(this).apply {
-                text = service
-                textSize = 17f
-                setTextColor(Color.rgb(25, 45, 70))
-                gravity = Gravity.CENTER
-                setPadding(10, 24, 10, 24)
-                background = roundedBackground(Color.WHITE, 20)
-                elevation = 6f
-                setOnClickListener { showNearby(service) }
+        root.addView(
+            location,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(76)
+            ).apply {
+                setMargins(0, dp(10), 0, dp(14))
             }
+        )
+
+        // ---------------- TRUST BANNER ----------------
+
+        val banner = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(18), dp(14), dp(14), dp(14))
+            background = GradientDrawable(
+                GradientDrawable.Orientation.LEFT_RIGHT,
+                intArrayOf(
+                    Color.rgb(12, 73, 170),
+                    Color.rgb(25, 102, 205)
+                )
+            ).apply {
+                cornerRadius = dp(20).toFloat()
+            }
+        }
+
+        val bannerText = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+        }
+
+        bannerText.addView(
+            text(
+                "Trusted Technicians",
+                21f,
+                Color.WHITE,
+                true
+            )
+        )
+
+        bannerText.addView(
+            text(
+                "Verified & Rated",
+                20f,
+                Color.WHITE,
+                true
+            )
+        )
+
+        bannerText.addView(
+            text(
+                "Fast. Reliable. Affordable.",
+                15f,
+                Color.WHITE
+            )
+        )
+
+        bannerText.addView(
+            text(
+                "👤 👩 👨   ⭐ 10K+",
+                15f,
+                Color.WHITE,
+                true
+            )
+        )
+
+        bannerText.addView(
+            text(
+                "Happy Customers",
+                13f,
+                Color.WHITE
+            )
+        )
+
+        banner.addView(
+            bannerText,
+            LinearLayout.LayoutParams(0, dp(190), 1f)
+        )
+
+        val technician = TextView(this).apply {
+            text = "👨‍🔧"
+            textSize = 72f
+            gravity = Gravity.CENTER
+        }
+
+        banner.addView(
+            technician,
+            LinearLayout.LayoutParams(dp(125), dp(170))
+        )
+
+        root.addView(
+            banner,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(190)
+            ).apply {
+                setMargins(0, 0, 0, dp(18))
+            }
+        )
+
+        // ---------------- SERVICE TITLE ----------------
+
+        root.addView(
+            text(
+                "What do you need help with?",
+                21f,
+                dark,
+                true
+            ),
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(45)
+            )
+        )
+
+        // ---------------- SERVICE GRID ----------------
+
+        val grid = GridLayout(this).apply {
+            columnCount = 2
+            rowCount = 4
+        }
+
+        val services = listOf(
+            "🔧" to "Plumber",
+            "⚡" to "Electrician",
+            "🪚" to "Carpenter",
+            "❄️" to "AC Technician",
+            "💧" to "RO / Water\nPurifier",
+            "🧺" to "Washing\nMachine",
+            "🧊" to "Refrigerator",
+            "•••" to "More\nServices"
+        )
+
+        services.forEach { (icon, name) ->
+
+            val card = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = Gravity.CENTER
+                setPadding(dp(8), dp(8), dp(8), dp(8))
+                background = roundedBackground(Color.WHITE, 18)
+                elevation = dp(2).toFloat()
+
+                setOnClickListener {
+                    showService(name.replace("\n", " "))
+                }
+            }
+
+            val iconView = TextView(this).apply {
+                text = icon
+                textSize = if (icon == "•••") 27f else 38f
+                gravity = Gravity.CENTER
+                background = roundedBackground(
+                    Color.rgb(240, 245, 255),
+                    50
+                )
+            }
+
+            card.addView(
+                iconView,
+                LinearLayout.LayoutParams(dp(78), dp(78))
+            )
+
+            val nameView = text(
+                name,
+                14f,
+                dark,
+                true
+            )
+            nameView.gravity = Gravity.CENTER
+
+            card.addView(
+                nameView,
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    dp(52)
+                )
+            )
+
             val params = GridLayout.LayoutParams().apply {
                 width = 0
-                height = GridLayout.LayoutParams.WRAP_CONTENT
-                columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
-                setMargins(6, 6, 6, 6)
+                height = dp(155)
+                columnSpec = GridLayout.spec(
+                    GridLayout.UNDEFINED,
+                    1f
+                )
+                setMargins(
+                    dp(5),
+                    dp(5),
+                    dp(5),
+                    dp(5)
+                )
             }
+
             grid.addView(card, params)
         }
 
-        content.addView(grid)
+        root.addView(
+            grid,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(650)
+            )
+        )
 
-        content.addView(Button(this).apply {
-            text = "👨‍🔧  Technician Mode"
-            textSize = 16f
-            setOnClickListener { showTechnician() }
-        }, marginParams(0, 22, 0, 0))
+        // ---------------- EMERGENCY BUTTON ----------------
 
-        scroll.addView(content)
-        root.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
-        setContentView(root)
-    }
-
-    private fun showNearby(service: String) {
-        val root = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(24, 28, 24, 20)
-            setBackgroundColor(Color.rgb(247, 249, 252))
-        }
-
-        root.addView(TextView(this).apply {
-            text = "$service technicians nearby"
-            textSize = 24f
-            setTextColor(Color.rgb(20, 70, 140))
-            setTypeface(null, Typeface.BOLD)
-        })
-
-        listOf(
-            "Raj Technician  •  1.2 km  •  ★ 4.8",
-            "Amit Technician •  2.1 km  •  ★ 4.6",
-            "Suresh Technician •  3.0 km  •  ★ 4.5"
-        ).forEach { technician ->
-            root.addView(Button(this).apply {
-                text = technician
-                textSize = 15f
-                setOnClickListener {
-                    Toast.makeText(this@MainActivity, "Request sent!", Toast.LENGTH_LONG).show()
-                }
-            }, marginParams(0, 10, 0, 0))
-        }
-
-        root.addView(Button(this).apply {
-            text = "← Back"
-            setOnClickListener { showHome() }
-        }, marginParams(0, 20, 0, 0))
-
-        setContentView(root)
-    }
-
-    private fun showTechnician() {
-        val root = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(24, 28, 24, 20)
-            setBackgroundColor(Color.rgb(247, 249, 252))
-        }
-
-        root.addView(TextView(this).apply {
-            text = "Technician Dashboard"
-            textSize = 26f
-            setTextColor(Color.rgb(20, 70, 140))
-            setTypeface(null, Typeface.BOLD)
-        })
-
-        root.addView(Switch(this).apply {
-            text = "Online / Available"
-            textSize = 17f
-            isChecked = true
-            setPadding(0, 20, 0, 20)
-        })
-
-        root.addView(Button(this).apply {
-            text = "📋  Demo Incoming Request"
-            setOnClickListener {
-                Toast.makeText(
-                    this@MainActivity,
-                    "New plumber request received",
-                    Toast.LENGTH_LONG
-                ).show()
+        val emergency = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(15), dp(12), dp(15), dp(12))
+            background = GradientDrawable(
+                GradientDrawable.Orientation.LEFT_RIGHT,
+                intArrayOf(
+                    Color.rgb(255, 65, 40),
+                    Color.rgb(235, 40, 30)
+                )
+            ).apply {
+                cornerRadius = dp(22).toFloat()
             }
-        })
 
-        root.addView(Button(this).apply {
-            text = "← Back"
+            setOnClickListener {
+                showEmergency()
+            }
+        }
+
+        val siren = text("🚨", 48f, Color.WHITE)
+        emergency.addView(
+            siren,
+            LinearLayout.LayoutParams(dp(75), dp(80))
+        )
+
+        val emergencyText = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+        }
+
+        emergencyText.addView(
+            text(
+                "NEED HELP NOW?",
+                20f,
+                Color.WHITE,
+                true
+            )
+        )
+
+        emergencyText.addView(
+            text(
+                "Technicians near you will\nrespond immediately",
+                14f,
+                Color.WHITE
+            )
+        )
+
+        emergency.addView(
+            emergencyText,
+            LinearLayout.LayoutParams(0, dp(85), 1f)
+        )
+
+        val go = TextView(this).apply {
+            text = "→"
+            textSize = 38f
+            gravity = Gravity.CENTER
+            setTextColor(Color.rgb(210, 45, 35))
+            background = roundedBackground(Color.WHITE, 50)
+        }
+
+        emergency.addView(
+            go,
+            LinearLayout.LayoutParams(dp(65), dp(65))
+        )
+
+        root.addView(
+            emergency,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(105)
+            ).apply {
+                setMargins(0, dp(12), 0, dp(18))
+            }
+        )
+
+        // ---------------- BENEFITS ----------------
+
+        val benefits = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            setPadding(dp(5), dp(12), dp(5), dp(12))
+            background = roundedBackground(Color.WHITE, 20)
+            elevation = dp(2).toFloat()
+        }
+
+        val benefitData = listOf(
+            "🛡️" to "Verified\nProfessionals",
+            "◷" to "Quick\nResponse",
+            "₹" to "Affordable\nPricing",
+            "⭐" to "Rated &\nReviewed"
+        )
+
+        benefitData.forEach { (icon, label) ->
+
+            val b = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = Gravity.CENTER
+            }
+
+            b.addView(
+                text(icon, 27f, blue, true),
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    dp(40)
+                )
+            )
+
+            val labelView = text(
+                label,
+                12f,
+                dark,
+                true
+            )
+            labelView.gravity = Gravity.CENTER
+
+            b.addView(
+                labelView,
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    dp(45)
+                )
+            )
+
+            benefits.addView(
+                b,
+                LinearLayout.LayoutParams(0, dp(90), 1f)
+            )
+        }
+
+        root.addView(
+            benefits,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(110)
+            ).apply {
+                setMargins(0, 0, 0, dp(18))
+            }
+        )
+
+        // ---------------- BOTTOM NAVIGATION ----------------
+
+        val nav = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            setPadding(dp(4), dp(8), dp(4), dp(8))
+            background = roundedBackground(Color.WHITE, 22)
+            elevation = dp(4).toFloat()
+        }
+
+        val navItems = listOf(
+            "⌂" to "Home",
+            "▣" to "Bookings",
+            "💬" to "Messages",
+            "🏷" to "Offers",
+            "♙" to "Profile"
+        )
+
+        navItems.forEachIndexed { index, item ->
+
+            val n = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = Gravity.CENTER
+                if (index == 0) {
+                    background = roundedBackground(
+                        Color.rgb(235, 243, 255),
+                        18
+                    )
+                }
+            }
+
+            n.addView(
+                text(
+                    item.first,
+                    25f,
+                    if (index == 0) blue else dark,
+                    true
+                ),
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    dp(32)
+                )
+            )
+
+            val label = text(
+                item.second,
+                11f,
+                if (index == 0) blue else dark,
+                index == 0
+            )
+            label.gravity = Gravity.CENTER
+
+            n.addView(
+                label,
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    dp(25)
+                )
+            )
+
+            nav.addView(
+                n,
+                LinearLayout.LayoutParams(0, dp(65), 1f)
+            )
+        }
+
+        root.addView(
+            nav,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(75)
+            )
+        )
+
+        setContentView(scroll)
+    }
+
+    private fun showService(service: String) {
+
+        val root = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(24), dp(40), dp(24), dp(24))
+            setBackgroundColor(Color.rgb(250, 251, 253))
+        }
+
+        root.addView(
+            text(
+                service,
+                27f,
+                blue,
+                true
+            )
+        )
+
+        root.addView(
+            text(
+                "Technicians near you",
+                20f,
+                dark,
+                true
+            ),
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(55)
+            )
+        )
+
+        val technicians = listOf(
+            "Raj Technician  •  1.2 km  •  ⭐ 4.8",
+            "Amit Technician  •  2.1 km  •  ⭐ 4.6",
+            "Suresh Technician  •  3.0 km  •  ⭐ 4.7"
+        )
+
+        technicians.forEach { technician ->
+
+            val card = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(dp(16), dp(10), dp(16), dp(10))
+                background = roundedBackground(Color.WHITE, 18)
+                elevation = dp(2).toFloat()
+            }
+
+            card.addView(
+                text(
+                    "👨‍🔧  $technician",
+                    15f,
+                    dark,
+                    true
+                )
+            )
+
+            val request = Button(this).apply {
+                text = "Request Now"
+                setOnClickListener {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Request sent!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+
+            card.addView(request)
+
+            root.addView(
+                card,
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    dp(120)
+                ).apply {
+                    setMargins(0, dp(8), 0, dp(8))
+                }
+            )
+        }
+
+        val back = Button(this).apply {
+            text = "← Back to Home"
             setOnClickListener { showHome() }
-        }, marginParams(0, 20, 0, 0))
+        }
+
+        root.addView(back)
 
         setContentView(root)
     }
 
-    private fun roundedBackground(color: Int, radius: Int) =
-        GradientDrawable().apply {
-            setColor(color)
-            cornerRadius = radius.toFloat()
-            setStroke(1, Color.rgb(225, 230, 238))
+    private fun showEmergency() {
+
+        val root = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            setPadding(dp(30), dp(40), dp(30), dp(30))
+            setBackgroundColor(Color.rgb(250, 251, 253))
         }
 
-    private fun marginParams(l: Int, t: Int, r: Int, b: Int) =
-        LinearLayout.LayoutParams(-1, -2).apply {
-            setMargins(l, t, r, b)
+        root.addView(
+            text("🚨", 70f, orange, true),
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(100)
+            )
+        )
+
+        root.addView(
+            text(
+                "Help is on the way!",
+                28f,
+                blue,
+                true
+            )
+        )
+
+        root.addView(
+            text(
+                "We're finding available technicians near your location.",
+                17f,
+                dark
+            ),
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(80)
+            )
+        )
+
+        val back = Button(this).apply {
+            text = "Back to Home"
+            setOnClickListener { showHome() }
         }
+
+        root.addView(back)
+
+        setContentView(root)
+    }
 }
-    
