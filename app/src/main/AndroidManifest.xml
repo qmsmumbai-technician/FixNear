@@ -6,7 +6,9 @@
     <application
         android:theme="@style/AppTheme"
         android:label="FixNear">
-
+<activity
+    android:name=".TechnicianRegistrationActivity"
+    android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
